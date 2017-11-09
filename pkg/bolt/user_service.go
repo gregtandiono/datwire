@@ -18,24 +18,29 @@ type UserService struct {
 	db *bolt.DB
 }
 
-// NewUserService returns a new instance of UserService
-func NewUserService() *UserService {
+// Open creates a connection to bolt db and inits a user bucket
+func (s *UserService) Open() error {
 	db, err := bolt.Open("user.db", 0600, nil)
 	if err != nil {
 		log.Fatal(err)
 	}
+	s.db = db
 	// initialize bucket if it does not exist
-	db.Update(func(tx *bolt.Tx) error {
+	return s.db.Update(func(tx *bolt.Tx) error {
 		_, err := tx.CreateBucketIfNotExists([]byte("users"))
 		if err != nil {
 			return err
 		}
 		return nil
 	})
+}
 
-	return &UserService{
-		db: db,
+// Close closes the underlying bolt db
+func (s *UserService) Close() error {
+	if s.db != nil {
+		return s.db.Close()
 	}
+	return nil
 }
 
 // User returns one user record
