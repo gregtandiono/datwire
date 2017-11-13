@@ -139,12 +139,6 @@ func (s *UserService) SetName(userID uuid.UUID, name string) error {
 	})
 }
 
-func (s *UserService) hashPassword(password string) ([]byte, error) {
-	p := []byte(password)
-	hash, err := bcrypt.GenerateFromPassword(p, bcrypt.DefaultCost)
-	return hash, err
-}
-
 // DeleteUser removes user from bolt db by matching id key
 func (s *UserService) DeleteUser(id uuid.UUID) error {
 	return s.db.Update(func(tx *bolt.Tx) error {
@@ -154,4 +148,31 @@ func (s *UserService) DeleteUser(id uuid.UUID) error {
 		}
 		return nil
 	})
+}
+
+// CheckIfUserExists queries the db for the user by username
+func (s *UserService) CheckIfUserExists(username string) (uuid.UUID, error) {
+	var userID uuid.UUID
+	var person *user.User
+
+	err := s.db.Update(func(tx *bolt.Tx) error {
+		bkt := tx.Bucket([]byte("users"))
+		c := bkt.Cursor()
+		for k, v := c.First(); k != nil; k, v = c.Next() {
+			if err := json.Unmarshal(v, &person); err != nil {
+				return err
+			} else if person.Username == username {
+				userID = person.ID
+			}
+		}
+		return nil
+	})
+
+	return userID, err
+}
+
+func (s *UserService) hashPassword(password string) ([]byte, error) {
+	p := []byte(password)
+	hash, err := bcrypt.GenerateFromPassword(p, bcrypt.DefaultCost)
+	return hash, err
 }
