@@ -175,12 +175,57 @@ func (suite *UserHandlerTestSuite) TestUserHandler_SetName() {
 }
 
 func (suite *UserHandlerTestSuite) TestUserHandler_SetName_VerifySet() {
+	request, _ := http.NewRequest("GET", "/users/"+suite.userID_1.String(), nil)
+	request.Header.Set("Content-Type", "application/json")
+	response := httptest.NewRecorder()
+
+	h := dwhttp.NewUserHandler()
+	h.UserService.Open()
+	defer h.UserService.Close()
+	h.ServeHTTP(response, request)
+
+	var responseBody *getUserResponseTemplate
+	json.Unmarshal(response.Body.Bytes(), &responseBody)
+
+	suite.Equal("", responseBody.Error, "error should be empty")
+	suite.Equal("success", responseBody.Message, "message should match")
+	suite.Equal("Benjamin Tandiono", responseBody.Data.Name, "name should match")
+	suite.Equal("gtandiono", responseBody.Data.Username, "username should match")
+	suite.Equal("admin", responseBody.Data.Type, "type should match")
 }
 
 func (suite *UserHandlerTestSuite) TestUserHandler_RemoveUser() {
+	request, _ := http.NewRequest("DELETE", "/users/"+suite.userID_2.String(), nil)
+	request.Header.Set("Content-Type", "application/json")
+	response := httptest.NewRecorder()
+
+	h := dwhttp.NewUserHandler()
+	h.UserService.Open()
+	defer h.UserService.Close()
+	h.ServeHTTP(response, request)
+
+	var responseBody *shared.ResponseTemplate
+	json.Unmarshal(response.Body.Bytes(), &responseBody)
+
+	suite.Equal("", responseBody.Error, "error should be empty")
+	suite.Equal("success", responseBody.Message, "message should match")
 }
 
 func (suite *UserHandlerTestSuite) TestUserHandler_RemoveUser_VerifyRemoval() {
+	request, _ := http.NewRequest("GET", "/users/"+suite.userID_2.String(), nil)
+	request.Header.Set("Content-Type", "application/json")
+	response := httptest.NewRecorder()
+
+	h := dwhttp.NewUserHandler()
+	h.UserService.Open()
+	defer h.UserService.Close()
+	h.ServeHTTP(response, request)
+
+	var responseBody *getUserResponseTemplate
+	json.Unmarshal(response.Body.Bytes(), &responseBody)
+
+	suite.Equal("fail", responseBody.Message, "message should match")
+	suite.Equal("user does not exist", responseBody.Error, "error message should match")
 }
 
 func TestUserHandlerSuite(t *testing.T) {
