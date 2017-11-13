@@ -2,6 +2,7 @@ package http
 
 import (
 	"datwire/pkg/bolt"
+	"datwire/pkg/shared"
 	"log"
 	"net/http"
 	"os"
@@ -33,9 +34,13 @@ func (h *UserHandler) handleGetUser(w http.ResponseWriter, r *http.Request) {
 
 	u, err := h.UserService.User(userID)
 	if err != nil {
-
+		shared.EncodeError(w, err, 400, h.Logger)
 	} else {
-
+		shared.EncodeJSON(
+			w,
+			&shared.ResponseTemplate{Message: "success", Data: u},
+			h.Logger,
+		)
 	}
 }
 

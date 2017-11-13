@@ -13,7 +13,8 @@ type ResponseTemplate struct {
 	Data    interface{} `json:"data"`
 }
 
-func encodeError(w http.ResponseWriter, err error, code int, logger *log.Logger) {
+// EncodeError represents JSON response builder for error state
+func EncodeError(w http.ResponseWriter, err error, code int, logger *log.Logger) {
 	logger.Printf("http error: %s (code=%d)", err, code)
 
 	// Write generic error response.
@@ -21,8 +22,9 @@ func encodeError(w http.ResponseWriter, err error, code int, logger *log.Logger)
 	json.NewEncoder(w).Encode(&ResponseTemplate{Message: "fail", Error: err.Error()})
 }
 
-func encodeJSON(w http.ResponseWriter, v interface{}, logger *log.Logger) {
+// EncodeJSON represents a generic JSON response builder
+func EncodeJSON(w http.ResponseWriter, v interface{}, logger *log.Logger) {
 	if err := json.NewEncoder(w).Encode(v); err != nil {
-		encodeError(w, err, http.StatusInternalServerError, logger)
+		EncodeError(w, err, http.StatusInternalServerError, logger)
 	}
 }
