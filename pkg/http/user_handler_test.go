@@ -7,7 +7,6 @@ import (
 	dwhttp "datwire/pkg/http"
 	"datwire/pkg/shared"
 	"encoding/json"
-	"fmt"
 	"log"
 	"net/http"
 	"net/http/httptest"
@@ -108,7 +107,6 @@ func (suite *UserHandlerTestSuite) TestUserHandler_CreateUser_VerifyCreate() {
 
 	var responseBody *getUserResponseTemplate
 	json.Unmarshal(response.Body.Bytes(), &responseBody)
-	fmt.Println(response.Body)
 
 	suite.Equal("", responseBody.Error, "error should be empty")
 	suite.Equal("success", responseBody.Message, "message should match")

@@ -1,6 +1,9 @@
 package auth
 
-import jwt "github.com/dgrijalva/jwt-go"
+import (
+	jwt "github.com/dgrijalva/jwt-go"
+	uuid "github.com/satori/go.uuid"
+)
 
 // Auth represents the return object once a user has been authorized
 type Auth struct {
@@ -16,5 +19,5 @@ type AuthClaims struct {
 
 // AuthService represents REST client that interacts with the user service API
 type AuthService interface {
-	Authorize(email string, password string) (*Auth, error)
+	Authorize(password, hashedPassword string, userID uuid.UUID) (*Auth, error)
 }

@@ -2,6 +2,7 @@ package bolt
 
 import (
 	"datwire/pkg/apps/auth"
+	"errors"
 	"time"
 
 	"golang.org/x/crypto/bcrypt"
@@ -14,15 +15,15 @@ import (
 type AuthService struct{}
 
 // Authorize returns an auth obj (id and token) after a successful authentication
-func (s *AuthService) Authorize(email, password, passwordFromDB string, userID uuid.UUID) (auth *auth.Auth, err error) {
-	if err = bcrypt.CompareHashAndPassword([]byte(password), []byte(passwordFromDB)); err != nil {
+func (s *AuthService) Authorize(password, hashedPassword string, userID uuid.UUID) (a *auth.Auth, err error) {
+	if err = bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(password)); err != nil {
+		err = errors.New("password does not match")
 		return
 	} else if token, tknerr := s.generateToken(userID, "d855496646e88b7c12e0a80135bef652"); tknerr != nil {
 		err = tknerr
 		return
 	} else {
-		auth.ID = userID.String()
-		auth.Token = token
+		a = &auth.Auth{ID: userID.String(), Token: token}
 		return
 	}
 }
