@@ -165,6 +165,9 @@ func (s *UserService) CheckIfUserExists(username string) (uuid.UUID, error) {
 				userID = person.ID
 			}
 		}
+		if userID == uuid.Nil {
+			return errors.New("user not found")
+		}
 		return nil
 	})
 
