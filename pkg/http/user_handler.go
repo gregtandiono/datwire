@@ -111,3 +111,12 @@ func (h *UserHandler) handleDeleteUser(w http.ResponseWriter, r *http.Request) {
 		shared.EncodeJSON(w, &shared.ResponseTemplate{Message: "success"}, h.Logger)
 	}
 }
+
+func (h *UserHandler) handleCheckIfUserExists(w http.ResponseWriter, r *http.Request) {
+	vals := r.FormValue("username")
+	if userID, err := h.UserService.CheckIfUserExists(vals); err != nil {
+		shared.EncodeError(w, err, 400, h.Logger)
+	} else {
+		shared.EncodeJSON(w, &shared.ResponseTemplate{Message: "success", Data: userID}, h.Logger)
+	}
+}
