@@ -18,6 +18,8 @@ type UserService struct {
 	db *bolt.DB
 }
 
+var _ user.UserService = &UserService{}
+
 // Open creates a connection to bolt db and inits a user bucket
 func (s *UserService) Open() error {
 	db, err := bolt.Open("user.db", 0600, nil)

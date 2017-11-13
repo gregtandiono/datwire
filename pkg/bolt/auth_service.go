@@ -14,6 +14,8 @@ import (
 // AuthService represents all service related to authentication
 type AuthService struct{}
 
+var _ auth.AuthService = &AuthService{}
+
 // Authorize returns an auth obj (id and token) after a successful authentication
 func (s *AuthService) Authorize(password, hashedPassword string, userID uuid.UUID) (a *auth.Auth, err error) {
 	if err = bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(password)); err != nil {
