@@ -63,6 +63,21 @@ func (suite *UserServiceTestSuite) TestUserService_CreateUser_VerifyCreation() {
 	suite.Equal("admin", u.Type, "type should match")
 }
 
+func (suite *UserServiceTestSuite) TestUserService_SetName() {
+	suite.userService.Open()
+	defer suite.userService.Close()
+	err := suite.userService.SetName(uuid.FromStringOrNil("099ef5d7-04d2-43b0-a765-907216f388da"), "Benjamin")
+	suite.Nil(err)
+}
+
+func (suite *UserServiceTestSuite) TestUserService_SetName_VerifySet() {
+	suite.userService.Open()
+	defer suite.userService.Close()
+	u, err := suite.userService.User(uuid.FromStringOrNil("099ef5d7-04d2-43b0-a765-907216f388da"))
+	suite.Nil(err)
+	suite.Equal("Benjamin", u.Name, "name should be updated")
+}
+
 func TestUserServiceSuite(t *testing.T) {
 	suite.Run(t, new(UserServiceTestSuite))
 }
