@@ -13,3 +13,13 @@ I will have to abstract test scripts for different services.
 ## Design
 
 *note: I'll insert some sort of graph here*
+
+## TODOs
+
+I'm currently using *Asana* for my issue tracking and planning. I will eventually move to **github issues** after its initial public release.
+
+- [ ] Service config
+- [ ] API Gateway
+- [ ] Integration Tests (gateway tests)
+
+...and many more that I'll have to add as I go along!
