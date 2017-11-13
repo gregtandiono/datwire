@@ -1,9 +1,15 @@
 package http_test
 
 import (
+	"bytes"
 	"datwire/pkg/apps/user"
 	"datwire/pkg/bolt"
+	dwhttp "datwire/pkg/http"
+	"datwire/pkg/shared"
+	"encoding/json"
 	"log"
+	"net/http"
+	"net/http/httptest"
 	"testing"
 
 	sysbolt "github.com/boltdb/bolt"
@@ -11,6 +17,18 @@ import (
 	uuid "github.com/satori/go.uuid"
 	"github.com/stretchr/testify/suite"
 )
+
+type getUserResponseTemplate struct {
+	Message string
+	Error   string
+	Data    *user.User
+}
+
+type getUsersResponseTemplate struct {
+	Message string
+	Error   string
+	Data    []user.User
+}
 
 type UserHandlerTestSuite struct {
 	suite.Suite
@@ -53,24 +71,116 @@ func (suite *UserHandlerTestSuite) TearDownSuite() {
 }
 
 func (suite *UserHandlerTestSuite) TestUserHandler_CreateUser() {
+	mockData := []byte(`{
+		"id": "` + suite.userID_1.String() + `",
+		"name": "Gregory Tandiono",
+		"username": "gtandiono",
+		"password": "themostawesomepasswordintheworld",
+		"type": "admin"
+	}`)
+
+	request, _ := http.NewRequest("POST", "/users", bytes.NewBuffer(mockData))
+	request.Header.Set("Content-Type", "application/json")
+	response := httptest.NewRecorder()
+
+	h := dwhttp.NewUserHandler()
+	h.UserService.Open()
+	defer h.UserService.Close()
+	h.ServeHTTP(response, request)
+
+	var responseBody *shared.ResponseTemplate
+	json.Unmarshal(response.Body.Bytes(), &responseBody)
+
+	suite.Equal("", responseBody.Error, "error should be empty")
+	suite.Equal("success", responseBody.Message, "message should match")
+}
+
+func (suite *UserHandlerTestSuite) TestUserHandler_CreateUser_VerifyCreate() {
+	request, _ := http.NewRequest("GET", "/users/"+suite.userID_1.String(), nil)
+	request.Header.Set("Content-Type", "application/json")
+	response := httptest.NewRecorder()
+
+	h := dwhttp.NewUserHandler()
+	h.UserService.Open()
+	defer h.UserService.Close()
+	h.ServeHTTP(response, request)
+
+	var responseBody *getUserResponseTemplate
+	json.Unmarshal(response.Body.Bytes(), &responseBody)
+
+	suite.Equal("", responseBody.Error, "error should be empty")
+	suite.Equal("success", responseBody.Message, "message should match")
+	suite.Equal("Gregory Tandiono", responseBody.Data.Name, "name should match")
+	suite.Equal("gtandiono", responseBody.Data.Username, "username should match")
+	suite.Equal("admin", responseBody.Data.Type, "type should match")
 }
 
 func (suite *UserHandlerTestSuite) TestUserHandler_FetchUser() {
+	request, _ := http.NewRequest("GET", "/users/"+suite.userID_2.String(), nil)
+	request.Header.Set("Content-Type", "application/json")
+	response := httptest.NewRecorder()
+
+	h := dwhttp.NewUserHandler()
+	h.UserService.Open()
+	defer h.UserService.Close()
+	h.ServeHTTP(response, request)
+
+	var responseBody *getUserResponseTemplate
+	json.Unmarshal(response.Body.Bytes(), &responseBody)
+
+	suite.Equal("", responseBody.Error, "error should be empty")
+	suite.Equal("success", responseBody.Message, "message should match")
+	suite.Equal("Augustus Kwok", responseBody.Data.Name, "name should match")
+	suite.Equal("akwok", responseBody.Data.Username, "username should match")
+	suite.Equal("admin", responseBody.Data.Type, "type should match")
 }
 
 func (suite *UserHandlerTestSuite) TestUserHandler_FetchUsers() {
+	request, _ := http.NewRequest("GET", "/users", nil)
+	request.Header.Set("Content-Type", "application/json")
+	response := httptest.NewRecorder()
+
+	h := dwhttp.NewUserHandler()
+	h.UserService.Open()
+	defer h.UserService.Close()
+	h.ServeHTTP(response, request)
+
+	var responseBody *getUsersResponseTemplate
+	json.Unmarshal(response.Body.Bytes(), &responseBody)
+
+	suite.Equal("", responseBody.Error, "error should be empty")
+	suite.Equal("success", responseBody.Message, "message should match")
+	suite.Equal(2, len(responseBody.Data), "user amount should match")
 }
 
 func (suite *UserHandlerTestSuite) TestUserHandler_SetName() {
+	mockData := []byte(`{
+		"name": "Benjamin Tandiono"
+	}`)
+
+	request, _ := http.NewRequest("PUT", "/users/"+suite.userID_1.String(), bytes.NewBuffer(mockData))
+	request.Header.Set("Content-Type", "application/json")
+	response := httptest.NewRecorder()
+
+	h := dwhttp.NewUserHandler()
+	h.UserService.Open()
+	defer h.UserService.Close()
+	h.ServeHTTP(response, request)
+
+	var responseBody *shared.ResponseTemplate
+	json.Unmarshal(response.Body.Bytes(), &responseBody)
+
+	suite.Equal("", responseBody.Error, "error should be empty")
+	suite.Equal("success", responseBody.Message, "message should match")
 }
 
 func (suite *UserHandlerTestSuite) TestUserHandler_SetName_VerifySet() {
 }
 
-func (suite *UserHandlerTestSuite) TestUserHandler_DeleteUser() {
+func (suite *UserHandlerTestSuite) TestUserHandler_RemoveUser() {
 }
 
-func (suite *UserHandlerTestSuite) TestUserHandler_DeleteUser_VerifyDelete() {
+func (suite *UserHandlerTestSuite) TestUserHandler_RemoveUser_VerifyRemoval() {
 }
 
 func TestUserHandlerSuite(t *testing.T) {

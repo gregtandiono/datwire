@@ -68,23 +68,10 @@ func (h *UserHandler) handleGetUsers(w http.ResponseWriter, r *http.Request) {
 
 func (h *UserHandler) handleCreateUser(w http.ResponseWriter, r *http.Request) {
 	var user *user.User
-	// if err := json.NewDecoder(r.Body).Decode(&user); err != nil {
-	// 	shared.EncodeError(w, err, 400, h.Logger)
-	// 	return
-	// } else if err := h.UserService.CreateUser(user); err != nil {
-	// 	shared.EncodeError(w, err, 400, h.Logger)
-	// } else {
-	// 	shared.EncodeJSON(w, &shared.ResponseTemplate{Message: "success"}, h.Logger)
-	// }
-
-	err := json.NewDecoder(r.Body).Decode(&user)
-	if err != nil {
+	if err := json.NewDecoder(r.Body).Decode(&user); err != nil {
 		shared.EncodeError(w, err, 400, h.Logger)
 		return
-	}
-
-	err = h.UserService.CreateUser(user)
-	if err != nil {
+	} else if err := h.UserService.CreateUser(user); err != nil {
 		shared.EncodeError(w, err, 400, h.Logger)
 	} else {
 		shared.EncodeJSON(w, &shared.ResponseTemplate{Message: "success"}, h.Logger)
