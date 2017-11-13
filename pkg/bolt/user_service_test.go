@@ -19,6 +19,18 @@ type UserServiceTestSuite struct {
 
 func (suite *UserServiceTestSuite) SetupSuite() {
 	suite.userService = &bolt.UserService{}
+
+	// seed one data
+	suite.userService.Open()
+	defer suite.userService.Close()
+
+	suite.userService.CreateUser(&user.User{
+		ID:       uuid.FromStringOrNil("028b5c04-f91e-4312-990d-33525456d1a3"),
+		Name:     "Augustus Kwok",
+		Username: "akwok",
+		Password: "superdupermart",
+		Type:     "admin",
+	})
 }
 
 func (suite *UserServiceTestSuite) TearDownSuite() {
@@ -63,6 +75,15 @@ func (suite *UserServiceTestSuite) TestUserService_CreateUser_VerifyCreation() {
 	suite.Equal("admin", u.Type, "type should match")
 }
 
+func (suite *UserServiceTestSuite) TestUserService_FetchAllUsers() {
+	suite.userService.Open()
+	defer suite.userService.Close()
+
+	users, err := suite.userService.Users()
+	suite.Nil(err)
+	suite.Equal(2, len(users), "user amount should match")
+}
+
 func (suite *UserServiceTestSuite) TestUserService_SetName() {
 	suite.userService.Open()
 	defer suite.userService.Close()
@@ -76,6 +97,24 @@ func (suite *UserServiceTestSuite) TestUserService_SetName_VerifySet() {
 	u, err := suite.userService.User(uuid.FromStringOrNil("099ef5d7-04d2-43b0-a765-907216f388da"))
 	suite.Nil(err)
 	suite.Equal("Benjamin", u.Name, "name should be updated")
+}
+
+func (suite *UserServiceTestSuite) TestUserService_RemoveUser() {
+	suite.userService.Open()
+	defer suite.userService.Close()
+
+	err := suite.userService.DeleteUser(uuid.FromStringOrNil("028b5c04-f91e-4312-990d-33525456d1a3"))
+	suite.Nil(err)
+}
+
+func (suite *UserServiceTestSuite) TestUserService_RemoveUser_VerifyRemoval() {
+	suite.userService.Open()
+	defer suite.userService.Close()
+
+	u, err := suite.userService.User(uuid.FromStringOrNil("028b5c04-f91e-4312-990d-33525456d1a3"))
+	suite.NotNil(err)
+	suite.Equal("user does not exist", err.Error(), "error message should match")
+	suite.Nil(u)
 }
 
 func TestUserServiceSuite(t *testing.T) {
