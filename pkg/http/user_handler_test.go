@@ -30,6 +30,12 @@ type getUsersResponseTemplate struct {
 	Data    []user.User
 }
 
+type checkIfUserExistsResponseTemplate struct {
+	Message string
+	Error   string
+	Data    uuid.UUID
+}
+
 type UserHandlerTestSuite struct {
 	suite.Suite
 	userService *bolt.UserService
@@ -226,6 +232,40 @@ func (suite *UserHandlerTestSuite) TestUserHandler_RemoveUser_VerifyRemoval() {
 
 	suite.Equal("fail", responseBody.Message, "message should match")
 	suite.Equal("user does not exist", responseBody.Error, "error message should match")
+}
+
+func (suite *UserHandlerTestSuite) TestUserHandler_CheckIfUserExists() {
+	request, _ := http.NewRequest("GET", "/users?username=akwok", nil)
+	request.Header.Set("Content-Type", "application/json")
+	response := httptest.NewRecorder()
+
+	h := dwhttp.NewUserHandler()
+	h.UserService.Open()
+	defer h.UserService.Close()
+	h.ServeHTTP(response, request)
+
+	var responseBody *checkIfUserExistsResponseTemplate
+	json.Unmarshal(response.Body.Bytes(), &responseBody)
+
+	suite.Equal("", responseBody.Error, "error should be empty")
+	suite.Equal("success", responseBody.Message, "message should match")
+	suite.Equal(suite.userID_2, responseBody.Data, "user id should match")
+}
+
+func (suite *UserHandlerTestSuite) TestUserHandler_CheckIfUserExists_ErrDoesNotExist() {
+	request, _ := http.NewRequest("GET", "/users?username=gtandiono", nil)
+	request.Header.Set("Content-Type", "application/json")
+	response := httptest.NewRecorder()
+
+	h := dwhttp.NewUserHandler()
+	h.UserService.Open()
+	defer h.UserService.Close()
+	h.ServeHTTP(response, request)
+
+	var responseBody *checkIfUserExistsResponseTemplate
+	json.Unmarshal(response.Body.Bytes(), &responseBody)
+	suite.Equal("fail", responseBody.Message, "message should match")
+	suite.Equal("user not found", responseBody.Error, "error should match")
 }
 
 func TestUserHandlerSuite(t *testing.T) {

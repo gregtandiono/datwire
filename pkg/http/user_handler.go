@@ -54,15 +54,24 @@ func (h *UserHandler) handleGetUser(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *UserHandler) handleGetUsers(w http.ResponseWriter, r *http.Request) {
-	users, err := h.UserService.Users()
-	if err != nil {
-		shared.EncodeError(w, err, 400, h.Logger)
+	vals := r.FormValue("username")
+	if vals != "" {
+		if userID, err := h.UserService.CheckIfUserExists(vals); err != nil {
+			shared.EncodeError(w, err, 400, h.Logger)
+		} else {
+			shared.EncodeJSON(w, &shared.ResponseTemplate{Message: "success", Data: userID}, h.Logger)
+		}
+
 	} else {
-		shared.EncodeJSON(
-			w,
-			&shared.ResponseTemplate{Message: "success", Data: users},
-			h.Logger,
-		)
+		if users, err := h.UserService.Users(); err != nil {
+			shared.EncodeError(w, err, 400, h.Logger)
+		} else {
+			shared.EncodeJSON(
+				w,
+				&shared.ResponseTemplate{Message: "success", Data: users},
+				h.Logger,
+			)
+		}
 	}
 }
 
