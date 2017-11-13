@@ -20,6 +20,8 @@ I'm currently using *Asana* for my issue tracking and planning. I will eventuall
 
 - [ ] Service config
 - [ ] API Gateway
-- [ ] Integration Tests (gateway tests)
+- [ ] Integration tests (gateway tests)
+- [ ] Test scripts
+- [ ] Runner scripts
 
 ...and many more that I'll have to add as I go along!
