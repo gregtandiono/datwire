@@ -1,6 +1,6 @@
 # .dat wire
 
-**.dat wire** is a monorepo for the [trade-wire](https://github.com/gregtandiono/trade-wire). I'm not happy with how I designed the `trade-wire` project, so this is a full rewrite with microservice design implementation.
+**.dat wire** is a monorepo for the [trade-wire](https://github.com/gregtandiono/trade-wire) project. I'm not happy with how I designed the `trade-wire` project, so this is a full rewrite with microservice design implementation. 
 
 ## Tests
 
