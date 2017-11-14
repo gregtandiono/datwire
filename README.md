@@ -26,6 +26,6 @@ I'm currently using *Asana* for my issue tracking and planning. I will eventuall
 - [ ] JWT claims should have expiration (1 week?)
 - [ ] Auth service should have a refresh token method
 - [ ] Consul integration for service discovery
-- [ ] Gokit integration for micro-service framework
+- [ ] Implement Gokit microservice design principles
 
 ...and many more that I'll have to add as I go along!

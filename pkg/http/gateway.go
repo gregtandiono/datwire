@@ -1,24 +1,25 @@
 package http
 
 import (
-	"log"
-	"os"
-
-	"github.com/gorilla/mux"
+	"net/http"
+	"strings"
 )
 
 // GatewayHandler represents the API gateway, in which lies between the client and the services.
 type GatewayHandler struct {
-	*mux.Router
-	Logger *log.Logger
+	UserGateway *UserGateway
 }
 
 // NewGatewayHandler returns a new instance of GatewayHandler
 func NewGatewayHandler() *GatewayHandler {
-	h := &GatewayHandler{
-		Router: mux.NewRouter(),
-		Logger: log.New(os.Stderr, "", log.LstdFlags),
+	return &GatewayHandler{
+		UserGateway: NewUserGateway(),
 	}
+}
 
-	return h
+func (g *GatewayHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	switch true {
+	case strings.HasPrefix(r.URL.Path, "/users"):
+		g.UserGateway.ServeHTTP(w, r)
+	}
 }
