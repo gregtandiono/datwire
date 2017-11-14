@@ -1,0 +1,14 @@
+[config]
+host = "localhost"
+version_prefix = "/api/v1"
+surveyor_hash= "23669220B18219CBC11D4F239D44EE3975159CEB8F2F0AD8E9FF53134618143C"
+admin_hash="4B557E7C07BD37C7CE007C1354F08097449214C78888692E8F710A3CE6624029"
+
+# Remote Development Environment
+[config.production]
+port = 8080
+db_name = "anakkandang"
+db_password = "xEgJtfFPbF55kSVr"
+db_user = "anakkandang"
+db_host = "anakkandang-prod.cs08sctrjfkq.ap-southeast-1.rds.amazonaws.com"
+hash_string = "d855496646e88b7c12e0a80135bef652"
