@@ -35,20 +35,13 @@ func (g *UserGateway) handleGetUser(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	userID := vars["id"]
 
-	response, err := http.Get("http://localhost:1337/users/" + userID)
-	if err != nil {
-		shared.EncodeError(w, err, 500, g.Logger)
-	}
+	gatewayHandlerFactory(
+		"GET",
+		"http://localhost:1337",
+		"/users/"+userID,
+		w, r, g.Logger,
+	)
 
-	// decode response
-	var responseBody *shared.ResponseTemplate
-	err = json.NewDecoder(response.Body).Decode(&responseBody)
-
-	if responseBody.Message == "fail" {
-		shared.EncodeError(w, errors.New(responseBody.Error), 400, g.Logger)
-	} else {
-		shared.EncodeJSON(w, responseBody, g.Logger)
-	}
 }
 
 // func (g *UserGateway) handleGetUsers(w http.ResponseWriter, r *http.Request) {
@@ -74,17 +67,39 @@ func (g *UserGateway) handleGetUser(w http.ResponseWriter, r *http.Request) {
 // }
 
 func (g *UserGateway) handleCreateUser(w http.ResponseWriter, r *http.Request) {
-	response, err := http.Post("http://localhost:1337/users", "application/json", r.Body)
-	if err != nil {
-		shared.EncodeError(w, err, 500, g.Logger)
-	}
+	gatewayHandlerFactory(
+		"POST",
+		"http://localhost:1337",
+		"/users",
+		w, r, g.Logger,
+	)
+}
 
+func gatewayHandlerFactory(reqMethod, targetBaseURL, endpoint string, w http.ResponseWriter, r *http.Request, l *log.Logger) {
 	var responseBody *shared.ResponseTemplate
-	err = json.NewDecoder(response.Body).Decode(&responseBody)
-	if responseBody.Message == "fail" {
-		shared.EncodeError(w, errors.New(responseBody.Error), 400, g.Logger)
-	} else {
-		shared.EncodeJSON(w, responseBody, g.Logger)
+	switch reqMethod {
+	case "POST":
+		response, err := http.Post(targetBaseURL+endpoint, "application/json", r.Body)
+		if err != nil {
+			shared.EncodeError(w, err, 500, l)
+		}
+		err = json.NewDecoder(response.Body).Decode(&responseBody)
+		if responseBody.Message == "fail" {
+			shared.EncodeError(w, errors.New(responseBody.Error), 400, l)
+		} else {
+			shared.EncodeJSON(w, responseBody, l)
+		}
+	case "GET":
+		response, err := http.Get(targetBaseURL + endpoint)
+		if err != nil {
+			shared.EncodeError(w, err, 500, l)
+		}
+		err = json.NewDecoder(response.Body).Decode(&responseBody)
+		if responseBody.Message == "fail" {
+			shared.EncodeError(w, errors.New(responseBody.Error), 400, l)
+		} else {
+			shared.EncodeJSON(w, responseBody, l)
+		}
 	}
 }
 
