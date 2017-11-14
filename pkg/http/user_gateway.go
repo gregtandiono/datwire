@@ -23,9 +23,10 @@ func NewUserGateway() *UserGateway {
 	}
 
 	g.Handle("/users/{id}", http.HandlerFunc(g.handleGetUser)).Methods("GET")
-	g.Handle("/users/{id}", http.HandlerFunc(g.handleSetName)).Methods("PUT")
 	g.Handle("/users", http.HandlerFunc(g.handleGetUsers)).Methods("GET")
 	g.Handle("/users", http.HandlerFunc(g.handleCreateUser)).Methods("POST")
+	g.Handle("/users/{id}", http.HandlerFunc(g.handleSetName)).Methods("PUT")
+	g.Handle("/users/{id}", http.HandlerFunc(g.handleDeleteUser)).Methods("DELETE")
 
 	return g
 }
@@ -84,13 +85,14 @@ func (g *UserGateway) handleSetName(w http.ResponseWriter, r *http.Request) {
 	)
 }
 
-// func (g *UserGateway) handleDeleteUser(w http.ResponseWriter, r *http.Request) {
-// 	vars := mux.Vars(r)
-// 	userID := uuid.FromStringOrNil(vars["id"])
+func (g *UserGateway) handleDeleteUser(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	userID := vars["id"]
 
-// 	if err := h.UserService.DeleteUser(userID); err != nil {
-// 		shared.EncodeError(w, err, 400, h.Logger)
-// 	} else {
-// 		shared.EncodeJSON(w, &shared.ResponseTemplate{Message: "success"}, h.Logger)
-// 	}
-// }
+	gatewayHandlerFactory(
+		"DELETE",
+		"http://localhost:1337",
+		"/users/"+userID,
+		w, r, g.Logger,
+	)
+}
