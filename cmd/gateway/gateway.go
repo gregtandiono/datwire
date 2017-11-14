@@ -17,14 +17,12 @@ func main() {
 		AllowedOrigins: []string{"*"},
 	})
 
-	h := dwhttp.NewUserHandler()
-	h.UserService.Open()
-	defer h.UserService.Close()
+	h := dwhttp.NewGatewayHandler()
 
 	n.Use(negroni.HandlerFunc(shared.Logger))
 	n.Use(c)
 	n.UseHandler(h)
 
-	fmt.Println("user service is running on port 1337")
-	log.Fatal(http.ListenAndServe(":1337", n))
+	fmt.Println("api gateway server is running on port 1338")
+	log.Fatal(http.ListenAndServe(":1338", n))
 }

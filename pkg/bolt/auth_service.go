@@ -32,10 +32,17 @@ func (s *AuthService) Authorize(password, hashedPassword string, userID uuid.UUI
 
 func (s *AuthService) generateToken(userID uuid.UUID, hashString string) (string, error) {
 	mySigningKey := []byte(hashString)
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"nbf": time.Now().Unix(),
-		"id":  userID,
-	})
+	token := jwt.NewWithClaims(
+		jwt.SigningMethodHS256,
+		jwt.MapClaims{
+			"nbf": time.Now().Unix(),
+			"id":  userID,
+		},
+		// @TODO:
+		// jwt.StandardClaims{
+		// 	ExpiresAt:
+		// },
+	)
 
 	tokenString, err := token.SignedString(mySigningKey)
 	return tokenString, err

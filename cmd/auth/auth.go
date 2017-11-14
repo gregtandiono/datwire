@@ -3,7 +3,6 @@ package main
 import (
 	dwhttp "datwire/pkg/http"
 	"datwire/pkg/shared"
-	"fmt"
 	"log"
 	"net/http"
 
@@ -17,14 +16,11 @@ func main() {
 		AllowedOrigins: []string{"*"},
 	})
 
-	h := dwhttp.NewUserHandler()
-	h.UserService.Open()
-	defer h.UserService.Close()
+	h := dwhttp.NewAuthHandler()
 
 	n.Use(negroni.HandlerFunc(shared.Logger))
 	n.Use(c)
 	n.UseHandler(h)
 
-	fmt.Println("user service is running on port 1337")
-	log.Fatal(http.ListenAndServe(":1337", n))
+	log.Fatal(http.ListenAndServe(":1338", n))
 }
