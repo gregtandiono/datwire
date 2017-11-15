@@ -18,7 +18,10 @@ type ServiceConfig struct {
 // GetEnvironmentVariables returns a serviceConfig based on the server environment.
 // If the environment is set to DEV, then it will look for a config.toml file.
 // On the other hand, it can also query config from consul.
-// Acceptable env variables: `DEVELOPMENT`, `CLUSTER_MODE`. `PRODUCTION`
+// Acceptable env variables: `DEVELOPMENT`, `CLUSTER_MODE`. `PRODUCTION`.
+// @TODO: each service may have a unique requirement, so we can't simply generalize
+// their configuration needs, so, either abstract this method per service name basis
+// or enhance it to satisfy all services' needs.
 func GetEnvironmentVariables(serviceName string) *ServiceConfig {
 	env := os.Getenv("ENV")
 	if env == "" {
