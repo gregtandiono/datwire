@@ -8,7 +8,7 @@ import (
 
 // Consuld is wrapper around the consul interface catered specifically for this application
 type Consuld struct {
-	*api.Client
+	client *api.Client
 }
 
 // NewConsuld creates a new instance of Consuld interface, and initiates a new consul client instance
@@ -21,12 +21,12 @@ func NewConsuld(consulConfig *api.Config) *Consuld {
 		log.Fatal(err)
 	}
 	return &Consuld{
-		Client: client,
+		client: client,
 	}
 }
 
 // GetAllServices returns all services available in a consul cluster
-func (c *Consuld) getAllServices() (services map[string]*api.AgentService, err error) {
-	services, err = c.Client.Agent().Services()
+func (c *Consuld) GetAllServices() (services map[string]*api.AgentService, err error) {
+	services, err = c.client.Agent().Services()
 	return
 }

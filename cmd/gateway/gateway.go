@@ -23,21 +23,8 @@ func main() {
 	n.Use(c)
 	n.UseHandler(h)
 
-	// @TODO:
-	// this is only for testing the consul API, will need to abstract this
-	// to its own package.
-	// client, err := api.NewClient(api.DefaultConfig())
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
+	serviceConfig := shared.GetEnvironmentVariables("datwire-gateway")
 
-	// agent := client.Agent()
-	// services, err := agent.Services()
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
-	// fmt.Println(services["datwire-gatewa"])
-
-	fmt.Println("api gateway server is running on port 1338")
-	log.Fatal(http.ListenAndServe(":1338", n))
+	fmt.Println("api gateway server is running on port " + serviceConfig.Port)
+	log.Fatal(http.ListenAndServe(":"+serviceConfig.Port, n))
 }

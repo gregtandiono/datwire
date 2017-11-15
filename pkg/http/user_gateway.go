@@ -1,6 +1,7 @@
 package http
 
 import (
+	"datwire/pkg/shared"
 	"log"
 	"net/http"
 	"os"
@@ -12,14 +13,16 @@ import (
 // and response from the service REST server over http protocol.
 type UserGateway struct {
 	*mux.Router
-	Logger *log.Logger
+	Logger        *log.Logger
+	ServiceConfig *shared.ServiceConfig
 }
 
 // NewUserGateway returns a new instance of UserGateway.
 func NewUserGateway() *UserGateway {
 	g := &UserGateway{
-		Router: mux.NewRouter(),
-		Logger: log.New(os.Stderr, "", log.LstdFlags),
+		Router:        mux.NewRouter(),
+		Logger:        log.New(os.Stderr, "", log.LstdFlags),
+		ServiceConfig: shared.GetEnvironmentVariables("datwire-users"),
 	}
 
 	g.Handle("/users/{id}", http.HandlerFunc(g.handleGetUser)).Methods("GET")
@@ -37,7 +40,8 @@ func (g *UserGateway) handleGetUser(w http.ResponseWriter, r *http.Request) {
 
 	gatewayHandlerFactory(
 		"GET",
-		"http://localhost:1337",
+		g.ServiceConfig.Address+":"+g.ServiceConfig.Port,
+		// "http://localhost:1337",
 		"/users/"+userID,
 		w, r, g.Logger,
 	)
@@ -50,14 +54,16 @@ func (g *UserGateway) handleGetUsers(w http.ResponseWriter, r *http.Request) {
 	if vals != "" {
 		gatewayHandlerFactory(
 			"GET",
-			"http://localhost:1337",
+			g.ServiceConfig.Address+":"+g.ServiceConfig.Port,
+			// "http://localhost:1337",
 			"/users?username="+vals,
 			w, r, g.Logger,
 		)
 	} else {
 		gatewayHandlerFactory(
 			"GET",
-			"http://localhost:1337",
+			g.ServiceConfig.Address+":"+g.ServiceConfig.Port,
+			// "http://localhost:1337",
 			"/users",
 			w, r, g.Logger,
 		)
@@ -67,7 +73,8 @@ func (g *UserGateway) handleGetUsers(w http.ResponseWriter, r *http.Request) {
 func (g *UserGateway) handleCreateUser(w http.ResponseWriter, r *http.Request) {
 	gatewayHandlerFactory(
 		"POST",
-		"http://localhost:1337",
+		g.ServiceConfig.Address+":"+g.ServiceConfig.Port,
+		// "http://localhost:1337",
 		"/users",
 		w, r, g.Logger,
 	)
@@ -79,7 +86,8 @@ func (g *UserGateway) handleSetName(w http.ResponseWriter, r *http.Request) {
 
 	gatewayHandlerFactory(
 		"PUT",
-		"http://localhost:1337",
+		g.ServiceConfig.Address+":"+g.ServiceConfig.Port,
+		// "http://localhost:1337",
 		"/users/"+userID,
 		w, r, g.Logger,
 	)
@@ -91,7 +99,8 @@ func (g *UserGateway) handleDeleteUser(w http.ResponseWriter, r *http.Request) {
 
 	gatewayHandlerFactory(
 		"DELETE",
-		"http://localhost:1337",
+		g.ServiceConfig.Address+":"+g.ServiceConfig.Port,
+		// "http://localhost:1337",
 		"/users/"+userID,
 		w, r, g.Logger,
 	)

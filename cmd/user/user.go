@@ -25,6 +25,8 @@ func main() {
 	n.Use(c)
 	n.UseHandler(h)
 
-	fmt.Println("user service is running on port 1337")
-	log.Fatal(http.ListenAndServe(":1337", n))
+	serviceConfig := shared.GetEnvironmentVariables("datwire-users")
+
+	fmt.Println("user service is running on port " + serviceConfig.Port)
+	log.Fatal(http.ListenAndServe(":"+serviceConfig.Port, n))
 }
