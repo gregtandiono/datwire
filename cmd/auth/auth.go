@@ -3,6 +3,7 @@ package main
 import (
 	dwhttp "datwire/pkg/http"
 	"datwire/pkg/shared"
+	"fmt"
 	"log"
 	"net/http"
 
@@ -22,5 +23,6 @@ func main() {
 	n.Use(c)
 	n.UseHandler(h)
 
-	log.Fatal(http.ListenAndServe(":1338", n))
+	fmt.Println("user service is running on port 1336")
+	log.Fatal(http.ListenAndServe(":1336", n))
 }
