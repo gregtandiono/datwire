@@ -30,3 +30,13 @@ func (c *Consuld) GetAllServices() (services map[string]*api.AgentService, err e
 	services, err = c.client.Agent().Services()
 	return
 }
+
+// GetKV is a wrapper around consul's client.KV.Get method.
+// I'm only registering the Get method because for this application,
+// I don't see any reason why it should write/post anything to the consul KV.
+func (c *Consuld) GetKV(key string, q *api.QueryOptions) (value string, err error) {
+	kv := c.client.KV()
+	kvp, _, err := kv.Get(key, q)
+	value = string(kvp.Value[:])
+	return
+}
