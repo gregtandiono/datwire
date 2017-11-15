@@ -41,7 +41,6 @@ func (g *UserGateway) handleGetUser(w http.ResponseWriter, r *http.Request) {
 	gatewayHandlerFactory(
 		"GET",
 		g.ServiceConfig.Address+":"+g.ServiceConfig.Port,
-		// "http://localhost:1337",
 		"/users/"+userID,
 		w, r, g.Logger,
 	)
@@ -55,7 +54,6 @@ func (g *UserGateway) handleGetUsers(w http.ResponseWriter, r *http.Request) {
 		gatewayHandlerFactory(
 			"GET",
 			g.ServiceConfig.Address+":"+g.ServiceConfig.Port,
-			// "http://localhost:1337",
 			"/users?username="+vals,
 			w, r, g.Logger,
 		)
@@ -63,7 +61,6 @@ func (g *UserGateway) handleGetUsers(w http.ResponseWriter, r *http.Request) {
 		gatewayHandlerFactory(
 			"GET",
 			g.ServiceConfig.Address+":"+g.ServiceConfig.Port,
-			// "http://localhost:1337",
 			"/users",
 			w, r, g.Logger,
 		)
@@ -74,7 +71,6 @@ func (g *UserGateway) handleCreateUser(w http.ResponseWriter, r *http.Request) {
 	gatewayHandlerFactory(
 		"POST",
 		g.ServiceConfig.Address+":"+g.ServiceConfig.Port,
-		// "http://localhost:1337",
 		"/users",
 		w, r, g.Logger,
 	)
@@ -87,7 +83,6 @@ func (g *UserGateway) handleSetName(w http.ResponseWriter, r *http.Request) {
 	gatewayHandlerFactory(
 		"PUT",
 		g.ServiceConfig.Address+":"+g.ServiceConfig.Port,
-		// "http://localhost:1337",
 		"/users/"+userID,
 		w, r, g.Logger,
 	)
@@ -100,7 +95,6 @@ func (g *UserGateway) handleDeleteUser(w http.ResponseWriter, r *http.Request) {
 	gatewayHandlerFactory(
 		"DELETE",
 		g.ServiceConfig.Address+":"+g.ServiceConfig.Port,
-		// "http://localhost:1337",
 		"/users/"+userID,
 		w, r, g.Logger,
 	)
