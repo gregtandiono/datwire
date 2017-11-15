@@ -40,10 +40,15 @@ func GetEnvironmentVariables(serviceName string) *ServiceConfig {
 		if err != nil {
 			log.Fatal(err)
 		}
+		hash, err := consuld.GetKV("datwire/config/hashString", nil)
+		if err != nil {
+			log.Fatal(err)
+		}
 		if service := services[serviceName]; service != nil {
 			return &ServiceConfig{
 				Address: service.Address,
 				Port:    strconv.Itoa(service.Port),
+				Hash:    hash,
 			}
 		}
 	}
