@@ -37,12 +37,13 @@ func NewAuthGateway() *AuthGateway {
 }
 
 func (g *AuthGateway) handleAuthorization(w http.ResponseWriter, r *http.Request) {
-	userID, _, err := g.handleFindUser("gtandiono")
+	userID, hashedPassword, err := g.handleCheckIfUserExists("gtandiono")
 	if err != nil {
 		fmt.Println("HERE????")
 		fmt.Println(err)
 	}
 	fmt.Println("user id", userID)
+	fmt.Println("hashed password", hashedPassword)
 	// gatewayHandlerFactory(
 	// 	"POST",
 	// 	g.ServiceConfig.Address+":"+g.ServiceConfig.Port,
@@ -51,10 +52,16 @@ func (g *AuthGateway) handleAuthorization(w http.ResponseWriter, r *http.Request
 	// )
 }
 
-type findUserResponse struct{}
+type checkIfUserExistsResponse struct {
+	shared.ResponseTemplate
+	Data struct { // override Data struct
+		ID             uuid.UUID
+		HashedPassword string
+	} `json:"data"`
+}
 
-func (g *AuthGateway) handleFindUser(username string) (userID uuid.UUID, hashedPassword string, err error) {
-	var responseBody *shared.ResponseTemplate
+func (g *AuthGateway) handleCheckIfUserExists(username string) (userID uuid.UUID, hashedPassword string, err error) {
+	var responseBody *checkIfUserExistsResponse
 	client := &http.Client{}
 
 	request, err := http.NewRequest(
@@ -70,13 +77,9 @@ func (g *AuthGateway) handleFindUser(username string) (userID uuid.UUID, hashedP
 
 	err = json.NewDecoder(response.Body).Decode(&responseBody)
 	if responseBody.Message == "success" {
-		// type assertion required without a supporting pointer for
-		// response body, since `Data` is an undefined interface
-		if str, ok := responseBody.Data.(string); ok {
-			userID = uuid.FromStringOrNil(str)
-		} else {
-			err = errors.New("bad data from auth request")
-		}
+		fmt.Println(responseBody)
+		userID = responseBody.Data.ID
+		hashedPassword = responseBody.Data.HashedPassword
 	} else {
 		err = errors.New(responseBody.Error)
 	}
