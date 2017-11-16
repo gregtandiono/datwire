@@ -22,16 +22,22 @@ type AuthHandler struct {
 
 // NewAuthHandler returns a new instance of AuthHandler
 func NewAuthHandler() *AuthHandler {
-	consuld := consul.NewConsuld(nil)
-	hash, err := consuld.GetKV("datwire/config/hashString", nil)
-	if err != nil {
-		log.Fatal(err)
+	var hashString string
+	if env := os.Getenv("ENV"); env != "TEST" {
+		consuld := consul.NewConsuld(nil)
+		hash, err := consuld.GetKV("datwire/config/hashString", nil)
+		hashString = hash
+		if err != nil {
+			log.Fatal(err)
+		}
+	} else {
+		hashString = "869826e158da8666906ec2681b19b96b729665fd2fae1328ace29171a1e8b3e2" // just for testing purposes
 	}
 	h := &AuthHandler{
 		Router: mux.NewRouter(),
 		Logger: log.New(os.Stderr, "", log.LstdFlags),
 		AuthService: &bolt.AuthService{
-			Hash: hash,
+			Hash: hashString,
 		},
 	}
 
