@@ -91,9 +91,28 @@ func (suite *CustomerServiceTestSuite) TestCustomerService_CreateCustomer() {
 }
 
 func (suite *CustomerServiceTestSuite) TestCustomerService_FetchCustomer() {
+	suite.customerService.Open()
+	defer suite.customerService.Close()
+
+	c, err := suite.customerService.Customer(suite.custID_3)
+	suite.Nil(err)
+	suite.Equal(suite.custID_3.String(), c.ID.String(), "id should match")
+	suite.Equal("Cargill Feed", c.Name, "name should match")
+	suite.Equal(
+		"Infina Park Blok B 73 No. 45, Jl. Dr. Saharjo, RT.1/RW.7, Manggarai, Tebet, Kota Jakarta Selatan, Daerah Khusus Ibukota Jakarta 12850",
+		c.Address,
+		"address should match",
+	)
+	suite.Equal("+6221678278", c.Telephone, "telephone should match")
+	suite.Equal("DK Lee", c.ProcurementPIC, "procurement PIC name")
+	suite.Equal("+62817682791989", c.ProcurementContactNumber, "procurement contact number should match")
+	suite.Equal("Kim Li", c.OperationsPIC, "operations PIC should match")
+	suite.Equal("+628719882791", c.OperationsContactNumber, "operations contact number should match")
+	suite.Equal("feed mill", c.Industry, "industry should match")
+	suite.Equal("lorem ipsum dolor sit amet", c.Notes, "notes should match")
 }
 
-func (suite *CustomerServiceTestSuite) TestCustomerService_FetchAllCustomers() {
+func (suite *CustomerServiceTestSuite) TestCustomerService_FetchCustomers() {
 }
 
 func (suite *CustomerServiceTestSuite) TestCustomerService_UpdateCustomer() {
