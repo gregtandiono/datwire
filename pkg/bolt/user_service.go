@@ -153,11 +153,10 @@ func (s *UserService) DeleteUser(id uuid.UUID) error {
 }
 
 // CheckIfUserExists queries the db for the user by username
-func (s *UserService) CheckIfUserExists(username string) (uuid.UUID, error) {
-	var userID uuid.UUID
+func (s *UserService) CheckIfUserExists(username string) (userID uuid.UUID, hashedPassword string, err error) {
 	var person *user.User
 
-	err := s.db.Update(func(tx *bolt.Tx) error {
+	err = s.db.Update(func(tx *bolt.Tx) error {
 		bkt := tx.Bucket([]byte("users"))
 		c := bkt.Cursor()
 		for k, v := c.First(); k != nil; k, v = c.Next() {
@@ -165,6 +164,7 @@ func (s *UserService) CheckIfUserExists(username string) (uuid.UUID, error) {
 				return err
 			} else if person.Username == username {
 				userID = person.ID
+				hashedPassword = person.Password
 			}
 		}
 		if userID == uuid.Nil {
@@ -173,7 +173,7 @@ func (s *UserService) CheckIfUserExists(username string) (uuid.UUID, error) {
 		return nil
 	})
 
-	return userID, err
+	return
 }
 
 func (s *UserService) hashPassword(password string) ([]byte, error) {

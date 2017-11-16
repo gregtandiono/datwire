@@ -135,8 +135,9 @@ func (suite *UserServiceTestSuite) TestUserService_CheckIfUserExists() {
 	suite.userService.Open()
 	defer suite.userService.Close()
 
-	userID, err := suite.userService.CheckIfUserExists("chalim")
+	userID, hashedPass, err := suite.userService.CheckIfUserExists("chalim")
 	suite.Nil(err)
+	suite.NotEmpty(hashedPass)
 	suite.Equal(suite.userID_3, userID, "user id should match")
 }
 
@@ -144,8 +145,9 @@ func (suite *UserServiceTestSuite) TestUserService_CheckIfUserExists_NotExist() 
 	suite.userService.Open()
 	defer suite.userService.Close()
 
-	userID, err := suite.userService.CheckIfUserExists("somerandomuser")
+	userID, hashedPass, err := suite.userService.CheckIfUserExists("somerandomuser")
 	suite.NotNil(err)
+	suite.Empty(hashedPass)
 	suite.Equal("user not found", err.Error(), "error message should match")
 	suite.Equal(uuid.Nil, userID, "user ID should return uuid.Nil")
 }

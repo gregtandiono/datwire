@@ -33,7 +33,10 @@ type getUsersResponseTemplate struct {
 type checkIfUserExistsResponseTemplate struct {
 	Message string
 	Error   string
-	Data    uuid.UUID
+	Data    struct {
+		ID             uuid.UUID
+		HashedPassword string
+	}
 }
 
 type UserHandlerTestSuite struct {
@@ -249,7 +252,8 @@ func (suite *UserHandlerTestSuite) TestUserHandler_CheckIfUserExists() {
 
 	suite.Equal("", responseBody.Error, "error should be empty")
 	suite.Equal("success", responseBody.Message, "message should match")
-	suite.Equal(suite.userID_2, responseBody.Data, "user id should match")
+	suite.Equal(suite.userID_2, responseBody.Data.ID, "user id should match")
+	suite.NotEmpty(responseBody.Data.HashedPassword)
 }
 
 func (suite *UserHandlerTestSuite) TestUserHandler_CheckIfUserExists_ErrDoesNotExist() {
