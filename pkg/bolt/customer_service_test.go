@@ -147,6 +147,11 @@ func (suite *CustomerServiceTestSuite) TestCustomerService_RemoveCustomer() {
 }
 
 func (suite *CustomerServiceTestSuite) TestCustomerService_RemoveCustomer_VerifyRemoval() {
+	suite.customerService.Open()
+	defer suite.customerService.Close()
+
+	_, err := suite.customerService.Customer(suite.custID_1)
+	suite.NotNil(err)
 }
 
 func TestCustomerServiceSuite(t *testing.T) {
