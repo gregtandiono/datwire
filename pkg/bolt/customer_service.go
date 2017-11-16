@@ -110,7 +110,7 @@ func (s *CustomerService) CreateCustomer(c *customer.Customer) error {
 func (s *CustomerService) UpdateCustomer(custID uuid.UUID, key, value string) error {
 	return s.db.Update(func(tx *bolt.Tx) error {
 		bkt := tx.Bucket([]byte("customers"))
-		var cust customer.Customer
+		var cust map[string]interface{}
 
 		if v := bkt.Get([]byte(custID.String())); v == nil {
 			return errors.New("customer does not exist")
@@ -118,7 +118,15 @@ func (s *CustomerService) UpdateCustomer(custID uuid.UUID, key, value string) er
 			return err
 		}
 
-		cust.UpdatedAt = time.Now()
+		cust[key] = value
+		cust["updated_at"] = time.Now().String()
+
+		if buf, err := json.Marshal(cust); err != nil {
+			return err
+		} else if err := bkt.Put([]byte(custID.String()), buf); err != nil {
+			return err
+		}
+
 		return nil
 	})
 }
