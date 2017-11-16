@@ -3,7 +3,6 @@ package bolt_test
 import (
 	"datwire/pkg/apps/customer"
 	"datwire/pkg/bolt"
-	"fmt"
 	"log"
 	"testing"
 
@@ -136,10 +135,15 @@ func (suite *CustomerServiceTestSuite) TestCustomerService_UpdateCustomer_Verify
 
 	c, err := suite.customerService.Customer(suite.custID_3)
 	suite.Nil(err)
-	fmt.Println(c)
+	suite.Equal("ola", c.Name, "name should be updated")
 }
 
 func (suite *CustomerServiceTestSuite) TestCustomerService_RemoveCustomer() {
+	suite.customerService.Open()
+	defer suite.customerService.Close()
+
+	err := suite.customerService.DeleteCustomer(suite.custID_1)
+	suite.Nil(err)
 }
 
 func (suite *CustomerServiceTestSuite) TestCustomerService_RemoveCustomer_VerifyRemoval() {
