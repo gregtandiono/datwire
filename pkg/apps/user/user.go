@@ -24,5 +24,5 @@ type UserService interface {
 	CreateUser(u *User) error
 	SetName(userID uuid.UUID, name string) error
 	DeleteUser(id uuid.UUID) error
-	CheckIfUserExists(username string) (uuid.UUID, error)
+	CheckIfUserExists(username string) (uuid.UUID, string, error)
 }

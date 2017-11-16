@@ -1,1 +1,3 @@
 *.db
+configs/*.toml
+!configs/*.sample.toml

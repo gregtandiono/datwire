@@ -53,13 +53,21 @@ func (h *UserHandler) handleGetUser(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+type checkUserResponseBody struct {
+	ID             uuid.UUID
+	HashedPassword string
+}
+
 func (h *UserHandler) handleGetUsers(w http.ResponseWriter, r *http.Request) {
 	vals := r.FormValue("username")
 	if vals != "" {
-		if userID, err := h.UserService.CheckIfUserExists(vals); err != nil {
+		if userID, hashedPass, err := h.UserService.CheckIfUserExists(vals); err != nil {
 			shared.EncodeError(w, err, 400, h.Logger)
 		} else {
-			shared.EncodeJSON(w, &shared.ResponseTemplate{Message: "success", Data: userID}, h.Logger)
+			shared.EncodeJSON(w, &shared.ResponseTemplate{Message: "success", Data: &checkUserResponseBody{
+				ID:             userID,
+				HashedPassword: hashedPass,
+			}}, h.Logger)
 		}
 
 	} else {

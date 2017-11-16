@@ -12,7 +12,9 @@ import (
 )
 
 // AuthService represents all service related to authentication
-type AuthService struct{}
+type AuthService struct {
+	Hash string
+}
 
 var _ auth.AuthService = &AuthService{}
 
@@ -21,7 +23,7 @@ func (s *AuthService) Authorize(password, hashedPassword string, userID uuid.UUI
 	if err = bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(password)); err != nil {
 		err = errors.New("password does not match")
 		return
-	} else if token, tknerr := s.generateToken(userID, "d855496646e88b7c12e0a80135bef652"); tknerr != nil {
+	} else if token, tknerr := s.generateToken(userID, s.Hash); tknerr != nil {
 		err = tknerr
 		return
 	} else {

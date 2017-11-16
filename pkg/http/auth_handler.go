@@ -22,9 +22,11 @@ type AuthHandler struct {
 // NewAuthHandler returns a new instance of AuthHandler
 func NewAuthHandler() *AuthHandler {
 	h := &AuthHandler{
-		Router:      mux.NewRouter(),
-		Logger:      log.New(os.Stderr, "", log.LstdFlags),
-		AuthService: &bolt.AuthService{},
+		Router: mux.NewRouter(),
+		Logger: log.New(os.Stderr, "", log.LstdFlags),
+		AuthService: &bolt.AuthService{
+			Hash: shared.GetEnvironmentVariables("datwire-auth").Hash,
+		},
 	}
 
 	h.Handle("/auth", http.HandlerFunc(h.handleAuthorization)).Methods("POST")

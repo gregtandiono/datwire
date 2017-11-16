@@ -3,6 +3,7 @@ package main
 import (
 	dwhttp "datwire/pkg/http"
 	"datwire/pkg/shared"
+	"fmt"
 	"log"
 	"net/http"
 
@@ -22,5 +23,7 @@ func main() {
 	n.Use(c)
 	n.UseHandler(h)
 
-	log.Fatal(http.ListenAndServe(":1338", n))
+	serviceConfig := shared.GetEnvironmentVariables("datwire-auth")
+	fmt.Println("user service is running on port " + serviceConfig.Port)
+	log.Fatal(http.ListenAndServe(":"+serviceConfig.Port, n))
 }

@@ -23,6 +23,8 @@ func main() {
 	n.Use(c)
 	n.UseHandler(h)
 
-	fmt.Println("api gateway server is running on port 1338")
-	log.Fatal(http.ListenAndServe(":1338", n))
+	serviceConfig := shared.GetEnvironmentVariables("datwire-gateway")
+
+	fmt.Println("api gateway server is running on port " + serviceConfig.Port)
+	log.Fatal(http.ListenAndServe(":"+serviceConfig.Port, n))
 }
