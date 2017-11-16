@@ -2,6 +2,7 @@ package http
 
 import (
 	"datwire/pkg/bolt"
+	"datwire/pkg/consul"
 	"datwire/pkg/shared"
 	"encoding/json"
 	"log"
@@ -21,11 +22,16 @@ type AuthHandler struct {
 
 // NewAuthHandler returns a new instance of AuthHandler
 func NewAuthHandler() *AuthHandler {
+	consuld := consul.NewConsuld(nil)
+	hash, err := consuld.GetKV("datwire/config/hashString", nil)
+	if err != nil {
+		log.Fatal(err)
+	}
 	h := &AuthHandler{
 		Router: mux.NewRouter(),
 		Logger: log.New(os.Stderr, "", log.LstdFlags),
 		AuthService: &bolt.AuthService{
-			Hash: shared.GetEnvironmentVariables("datwire-auth").Hash,
+			Hash: hash,
 		},
 	}
 
