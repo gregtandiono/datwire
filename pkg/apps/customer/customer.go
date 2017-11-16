@@ -16,6 +16,8 @@ type Customer struct {
 	ProcurementContactNumber string    `json:"procurement_contact_number"`
 	OperationsPIC            string    `json:"operations_pic"`
 	OperationsContactNumber  string    `json:"operations_contact_number"`
+	Industry                 string    `json:"industry"`
+	Notes                    string    `json:"notes"`
 	CreatedAt                time.Time
 	UpdatedAt                time.Time
 }
