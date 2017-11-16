@@ -72,6 +72,42 @@ func (suite *CustomerServiceTestSuite) TearDownSuite() {
 	})
 }
 
+func (suite *CustomerServiceTestSuite) TestCustomerService_CreateCustomer() {
+	suite.customerService.Open()
+	defer suite.customerService.Close()
+	err := suite.customerService.CreateCustomer(&customer.Customer{
+		ID:                       suite.custID_3,
+		Name:                     "Cargill Feed",
+		Address:                  "Infina Park Blok B 73 No. 45, Jl. Dr. Saharjo, RT.1/RW.7, Manggarai, Tebet, Kota Jakarta Selatan, Daerah Khusus Ibukota Jakarta 12850",
+		Telephone:                "+6221678278",
+		ProcurementPIC:           "DK Lee",
+		ProcurementContactNumber: "+62817682791989",
+		OperationsPIC:            "Kim Li",
+		OperationsContactNumber:  "+628719882791",
+		Industry:                 "feed mill",
+		Notes:                    "lorem ipsum dolor sit amet",
+	})
+	suite.Nil(err)
+}
+
+func (suite *CustomerServiceTestSuite) TestCustomerService_FetchCustomer() {
+}
+
+func (suite *CustomerServiceTestSuite) TestCustomerService_FetchAllCustomers() {
+}
+
+func (suite *CustomerServiceTestSuite) TestCustomerService_UpdateCustomer() {
+}
+
+func (suite *CustomerServiceTestSuite) TestCustomerService_UpdateCustomer_VeriyUpdate() {
+}
+
+func (suite *CustomerServiceTestSuite) TestCustomerService_RemoveCustomer() {
+}
+
+func (suite *CustomerServiceTestSuite) TestCustomerService_RemoveCustomer_VerifyRemoval() {
+}
+
 func TestCustomerServiceSuite(t *testing.T) {
 	suite.Run(t, new(CustomerServiceTestSuite))
 }
