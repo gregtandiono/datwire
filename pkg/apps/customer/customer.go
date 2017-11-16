@@ -3,7 +3,7 @@ package customer
 import (
 	"time"
 
-	"github.com/pborman/uuid"
+	uuid "github.com/satori/go.uuid"
 )
 
 // Customer represents customer data model
