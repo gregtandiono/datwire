@@ -21,4 +21,10 @@ type Customer struct {
 }
 
 // CustomerService represents customer model CRUD implementation to the BoltDB
-type CustomerService interface{}
+type CustomerService interface {
+	Customer(id uuid.UUID) (*Customer, error)
+	Customers() ([]Customer, error)
+	CreateCustomer(c *Customer) error
+	UpdateCustomer(customerID uuid.UUID, key, value string) error
+	DeleteUser(id uuid.UUID) error
+}
