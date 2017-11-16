@@ -113,9 +113,17 @@ func (suite *CustomerServiceTestSuite) TestCustomerService_FetchCustomer() {
 }
 
 func (suite *CustomerServiceTestSuite) TestCustomerService_FetchCustomers() {
+	suite.customerService.Open()
+	defer suite.customerService.Close()
+
+	customers, err := suite.customerService.Customers()
+	suite.Nil(err)
+	suite.Equal(3, len(customers), "amount of customers should match")
 }
 
 func (suite *CustomerServiceTestSuite) TestCustomerService_UpdateCustomer() {
+	suite.customerService.Open()
+	defer suite.customerService.Close()
 }
 
 func (suite *CustomerServiceTestSuite) TestCustomerService_UpdateCustomer_VeriyUpdate() {
