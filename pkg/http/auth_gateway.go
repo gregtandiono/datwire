@@ -1,10 +1,10 @@
 package http
 
 import (
+	"bytes"
 	"datwire/pkg/shared"
 	"encoding/json"
 	"errors"
-	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -36,20 +36,50 @@ func NewAuthGateway() *AuthGateway {
 	return g
 }
 
+type loginRequestBody struct {
+	Username string `json:"username"`
+	Password string `json:"password"`
+}
+
 func (g *AuthGateway) handleAuthorization(w http.ResponseWriter, r *http.Request) {
+	var reqBody *loginRequestBody
+	err := json.NewDecoder(r.Body).Decode(&reqBody)
+	if err != nil {
+		shared.EncodeError(w, err, 400, g.Logger)
+	}
+
 	userID, hashedPassword, err := g.handleCheckIfUserExists("gtandiono")
 	if err != nil {
-		fmt.Println("HERE????")
-		fmt.Println(err)
+		shared.EncodeError(w, err, 400, g.Logger)
 	}
-	fmt.Println("user id", userID)
-	fmt.Println("hashed password", hashedPassword)
-	// gatewayHandlerFactory(
-	// 	"POST",
-	// 	g.ServiceConfig.Address+":"+g.ServiceConfig.Port,
-	// 	"/auth",
-	// 	w, r, g.Logger,
-	// )
+
+	var responseBody *shared.ResponseTemplate
+	client := &http.Client{}
+
+	request, err := http.NewRequest(
+		"POST",
+		g.ServiceConfig.Address+":"+g.ServiceConfig.Port+"/auth",
+		bytes.NewBufferString(`{
+			"user_id": "`+userID.String()+`",
+			"password": "`+reqBody.Password+`",
+			"hashed_password": "`+hashedPassword+`"
+		}`),
+	)
+	if err != nil {
+		shared.EncodeError(w, err, 400, g.Logger)
+	}
+
+	response, err := client.Do(request)
+	if err != nil {
+		shared.EncodeError(w, err, 500, g.Logger)
+	}
+
+	err = json.NewDecoder(response.Body).Decode(&responseBody)
+	if responseBody.Message == "fail" {
+		shared.EncodeError(w, errors.New(responseBody.Error), 400, g.Logger)
+	} else {
+		shared.EncodeJSON(w, responseBody, g.Logger)
+	}
 }
 
 type checkIfUserExistsResponse struct {
@@ -77,7 +107,6 @@ func (g *AuthGateway) handleCheckIfUserExists(username string) (userID uuid.UUID
 
 	err = json.NewDecoder(response.Body).Decode(&responseBody)
 	if responseBody.Message == "success" {
-		fmt.Println(responseBody)
 		userID = responseBody.Data.ID
 		hashedPassword = responseBody.Data.HashedPassword
 	} else {

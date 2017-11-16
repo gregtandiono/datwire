@@ -32,6 +32,8 @@ func (g *GatewayHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// gatewayHandlerFactory is a generic request builder that wraps http.NewRequest
+// this is to simplify http protocols between the API gateway and services
 func gatewayHandlerFactory(reqMethod, targetBaseURL, endpoint string, w http.ResponseWriter, r *http.Request, l *log.Logger) {
 	var responseBody *shared.ResponseTemplate
 	client := &http.Client{}

@@ -2,7 +2,6 @@ package shared
 
 import (
 	"datwire/pkg/consul"
-	"fmt"
 	"log"
 	"os"
 	"strconv"
@@ -44,7 +43,7 @@ func GetEnvironmentVariables(serviceName string) *ServiceConfig {
 		}
 		hash, err := consuld.GetKV("datwire/config/hashString", nil)
 		if err != nil {
-			fmt.Println(err)
+			log.Fatal(err)
 		}
 		if service := services[serviceName]; service != nil {
 			return &ServiceConfig{
