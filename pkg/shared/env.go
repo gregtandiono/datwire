@@ -2,6 +2,7 @@ package shared
 
 import (
 	"datwire/pkg/consul"
+	"fmt"
 	"log"
 	"os"
 	"strconv"
@@ -19,7 +20,8 @@ type ServiceConfig struct {
 // If the environment is set to DEV, then it will look for a config.toml file.
 // On the other hand, it can also query config from consul.
 // Acceptable env variables: `DEVELOPMENT`, `CLUSTER_MODE`. `PRODUCTION`.
-// @TODO: each service may have a unique requirement, so we can't simply generalize
+// @TODO:
+// each service may have a unique requirement, so we can't simply generalize
 // their configuration needs, so, either abstract this method per service name basis
 // or enhance it to satisfy all services' needs.
 func GetEnvironmentVariables(serviceName string) *ServiceConfig {
@@ -42,7 +44,7 @@ func GetEnvironmentVariables(serviceName string) *ServiceConfig {
 		}
 		hash, err := consuld.GetKV("datwire/config/hashString", nil)
 		if err != nil {
-			log.Fatal(err)
+			fmt.Println(err)
 		}
 		if service := services[serviceName]; service != nil {
 			return &ServiceConfig{
