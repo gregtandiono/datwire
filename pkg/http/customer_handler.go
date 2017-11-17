@@ -5,6 +5,7 @@ import (
 	"datwire/pkg/bolt"
 	"datwire/pkg/shared"
 	"encoding/json"
+	"errors"
 	"log"
 	"net/http"
 	"os"
@@ -77,10 +78,33 @@ func (h *CustomerHandler) handleCreateCustomer(w http.ResponseWriter, r *http.Re
 }
 
 func (h *CustomerHandler) handleUpdateCustomer(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	custID := uuid.FromStringOrNil(vars["id"])
+
 	var updateReqBody map[string]interface{}
 	err := json.NewDecoder(r.Body).Decode(&updateReqBody)
 	if err != nil {
 		shared.EncodeError(w, err, 400, h.Logger)
+		return
+	}
+
+	var groupedErr []error
+
+	for k, v := range updateReqBody {
+		if str, ok := v.(string); ok {
+			err := h.CustomerService.UpdateCustomer(custID, k, str)
+			if err != nil {
+				groupedErr = append(groupedErr, errors.New("update error at field "+k+" "+err.Error()))
+			}
+		} else {
+			groupedErr = append(groupedErr, errors.New("value not valid"))
+		}
+	}
+
+	if len(groupedErr) > 0 {
+		shared.EncodeError(w, err, 400, h.Logger)
+	} else {
+		shared.EncodeJSON(w, &shared.ResponseTemplate{Message: "success"}, h.Logger)
 	}
 }
 
