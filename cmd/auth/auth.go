@@ -24,6 +24,6 @@ func main() {
 	n.UseHandler(h)
 
 	serviceConfig := shared.GetEnvironmentVariables("datwire-auth")
-	fmt.Println("user service is running on port " + serviceConfig.Port)
+	fmt.Println("auth service is running on port " + serviceConfig.Port)
 	log.Fatal(http.ListenAndServe(":"+serviceConfig.Port, n))
 }
