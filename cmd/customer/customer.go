@@ -17,13 +17,16 @@ func main() {
 		AllowedOrigins: []string{"*"},
 	})
 
-	h := dwhttp.NewAuthHandler()
+	h := dwhttp.NewCustomerHandler()
+	h.CustomerService.Open()
+	defer h.CustomerService.Close()
 
 	n.Use(negroni.HandlerFunc(shared.Logger))
 	n.Use(c)
 	n.UseHandler(h)
 
-	serviceConfig := shared.GetEnvironmentVariables("datwire-auth")
-	fmt.Println("auth service is running on port " + serviceConfig.Port)
+	serviceConfig := shared.GetEnvironmentVariables("datwire-customers")
+
+	fmt.Println("customer service is running on port " + serviceConfig.Port)
 	log.Fatal(http.ListenAndServe(":"+serviceConfig.Port, n))
 }

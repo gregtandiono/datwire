@@ -11,15 +11,17 @@ import (
 
 // GatewayHandler represents the API gateway, in which lies between the client and the services.
 type GatewayHandler struct {
-	UserGateway *UserGateway
-	AuthGateway *AuthGateway
+	UserGateway     *UserGateway
+	AuthGateway     *AuthGateway
+	CustomerGateway *CustomerGateway
 }
 
 // NewGatewayHandler returns a new instance of GatewayHandler
 func NewGatewayHandler() *GatewayHandler {
 	return &GatewayHandler{
-		UserGateway: NewUserGateway(),
-		AuthGateway: NewAuthGateway(),
+		UserGateway:     NewUserGateway(),
+		AuthGateway:     NewAuthGateway(),
+		CustomerGateway: NewCustomerGateway(),
 	}
 }
 
@@ -29,6 +31,8 @@ func (g *GatewayHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		g.UserGateway.ServeHTTP(w, r)
 	case strings.HasPrefix(r.URL.Path, "/auth"):
 		g.AuthGateway.ServeHTTP(w, r)
+	case strings.HasPrefix(r.URL.Path, "/customers"):
+		g.CustomerGateway.ServeHTTP(w, r)
 	}
 }
 
