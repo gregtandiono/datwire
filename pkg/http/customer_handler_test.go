@@ -23,6 +23,12 @@ type getCustomerResponseTemplate struct {
 	Data    *customer.Customer
 }
 
+type getCustomersResponseTemplate struct {
+	Message string
+	Error   string
+	Data    []customer.Customer
+}
+
 type CustomerHandlerTestSuite struct {
 	suite.Suite
 	customerService *bolt.CustomerService
@@ -115,7 +121,7 @@ func (suite *CustomerHandlerTestSuite) TestCustomerHandler_CreateUser() {
 	suite.Equal("success", responseBody.Message, "message should match")
 }
 
-func (suite *CustomerHandlerTestSuite) TestCustomerHandler_FetchUser() {
+func (suite *CustomerHandlerTestSuite) TestCustomerHandler_FetchCustomer() {
 	request, _ := http.NewRequest("GET", "/customers/"+suite.custID_3.String(), nil)
 	request.Header.Set("Content-Type", "application/json")
 	response := httptest.NewRecorder()
@@ -145,6 +151,24 @@ func (suite *CustomerHandlerTestSuite) TestCustomerHandler_FetchUser() {
 	suite.Equal("+628719882791", responseBody.Data.OperationsContactNumber, "operations contact number should match")
 	suite.Equal("feed mill", responseBody.Data.Industry, "industry should match")
 	suite.Equal("lorem ipsum dolor sit amet", responseBody.Data.Notes, "notes should match")
+}
+
+func (suite *CustomerHandlerTestSuite) TestCustomerHandler_FetchCustomers() {
+	request, _ := http.NewRequest("GET", "/customers", nil)
+	request.Header.Set("Content-Type", "application/json")
+	response := httptest.NewRecorder()
+
+	h := dwhttp.NewCustomerHandler()
+	h.CustomerService.Open()
+	defer h.CustomerService.Close()
+	h.ServeHTTP(response, request)
+
+	var responseBody *getCustomersResponseTemplate
+	json.Unmarshal(response.Body.Bytes(), &responseBody)
+
+	suite.Equal("", responseBody.Error, "error should be empty")
+	suite.Equal("success", responseBody.Message, "message should match")
+	suite.Equal(3, len(responseBody.Data), "amount of customers should match")
 }
 
 func TestCustomerHandlerSuite(t *testing.T) {
