@@ -28,6 +28,12 @@ func NewCustomerHandler() *CustomerHandler {
 		CustomerService: &bolt.CustomerService{},
 	}
 
+	h.Handle("/customers", http.HandlerFunc(h.handleCreateCustomer)).Methods("POST")
+	h.Handle("/customers/{id}", http.HandlerFunc(h.handleGetCustomer)).Methods("GET")
+	h.Handle("/customers", http.HandlerFunc(h.handleGetCustomers)).Methods("GET")
+	h.Handle("/customers/{id}", http.HandlerFunc(h.handleUpdateCustomer)).Methods("PUT")
+	h.Handle("/customers/{id}", http.HandlerFunc(h.handleDeleteCustomer)).Methods("DELETE")
+
 	return h
 }
 
