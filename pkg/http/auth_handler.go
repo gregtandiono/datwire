@@ -33,6 +33,7 @@ func NewAuthHandler() *AuthHandler {
 	} else {
 		hashString = "869826e158da8666906ec2681b19b96b729665fd2fae1328ace29171a1e8b3e2" // just for testing purposes
 	}
+
 	h := &AuthHandler{
 		Router: mux.NewRouter(),
 		Logger: log.New(os.Stderr, "", log.LstdFlags),
