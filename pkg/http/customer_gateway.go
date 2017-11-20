@@ -7,6 +7,7 @@ import (
 	"os"
 
 	"github.com/gorilla/mux"
+	"github.com/urfave/negroni"
 )
 
 // CustomerGateway is a transport layer to decode/encode JSON request
@@ -25,11 +26,30 @@ func NewCustomerGateway() *CustomerGateway {
 		ServiceConfig: shared.GetEnvironmentVariables("datwire-customers"),
 	}
 
-	g.Handle("/customers/{id}", http.HandlerFunc(g.handleGetCustomer)).Methods("GET")
-	g.Handle("/customers", http.HandlerFunc(g.handleGetCustomers)).Methods("GET")
-	g.Handle("/customers", http.HandlerFunc(g.handleCreateCustomer)).Methods("POST")
-	g.Handle("/customers/{id}", http.HandlerFunc(g.handleUpdateCustomer)).Methods("PUT")
-	g.Handle("/customers/{id}", http.HandlerFunc(g.handleDeleteCustomer)).Methods("DELETE")
+	g.Handle("/customers/{id}", negroni.New(
+		negroni.HandlerFunc(shared.JWTMiddleware(shared.GetHash()).HandlerWithNext),
+		negroni.Wrap(http.HandlerFunc(g.handleGetCustomer)),
+	)).Methods("GET")
+
+	g.Handle("/customers", negroni.New(
+		negroni.HandlerFunc(shared.JWTMiddleware(shared.GetHash()).HandlerWithNext),
+		negroni.Wrap(http.HandlerFunc(g.handleGetCustomers)),
+	)).Methods("GET")
+
+	g.Handle("/customer/{id}", negroni.New(
+		negroni.HandlerFunc(shared.JWTMiddleware(shared.GetHash()).HandlerWithNext),
+		negroni.Wrap(http.HandlerFunc(g.handleCreateCustomer)),
+	)).Methods("POST")
+
+	g.Handle("/customer/{id}", negroni.New(
+		negroni.HandlerFunc(shared.JWTMiddleware(shared.GetHash()).HandlerWithNext),
+		negroni.Wrap(http.HandlerFunc(g.handleUpdateCustomer)),
+	)).Methods("PUT")
+
+	g.Handle("/customer/{id}", negroni.New(
+		negroni.HandlerFunc(shared.JWTMiddleware(shared.GetHash()).HandlerWithNext),
+		negroni.Wrap(http.HandlerFunc(g.handleDeleteCustomer)),
+	)).Methods("DELETE")
 
 	return g
 }
